@@ -10,7 +10,7 @@ def analyze_url(request: AnalyzeRequest):
     """
     Analyze Sentiment of YouTube video comments
     
-    Request body:
+    Parameters:
         - video_url: URL of the YouTube video
         - max_comments: Number of comments to analyze (100)
     """
