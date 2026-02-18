@@ -28,3 +28,4 @@ class AnalysisResponse(BaseModel):
     comments: List[CommentResult]
     processing_time_ms: int
     cached: bool = False
+    source: str

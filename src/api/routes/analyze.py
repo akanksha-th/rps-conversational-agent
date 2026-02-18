@@ -1,16 +1,19 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from src.schemas.requests import AnalyzeRequest
 from src.schemas.responses import AnalysisResponse
 from src.services.youtube import YouTubeService
 from src.services.analyzer import AnalyzerService
+from src.services.cache import CacheService
 from src.utils.validators import get_videoId
+from src.api.dependencies import rate_limiter
 
 router = APIRouter()
 
 youtube_service = YouTubeService()
 analyzer_service = AnalyzerService()
+cache_service = CacheService()
 
-@router.post("/analyze")
+@router.post("/analyze", dependencies=[Depends(rate_limiter)])
 def analyze_url(request: AnalyzeRequest):
     """
     Analyze Sentiment of YouTube video comments
@@ -22,6 +25,14 @@ def analyze_url(request: AnalyzeRequest):
             status_code=400, 
             detail="Invalid YouTube URL"
         )
+    
+    # cache_key = f"{video_id}:{request.max_comments}"
+    cache_key = cache_service.generate_analysis_key(video_id, request.max_comments)
+    cached_data = cache_service.get(cache_key)
+    if cached_data:
+        cached_data["cached"] = True
+        cached_data["source"] = "cache"
+        return AnalysisResponse(**cached_data)
     
     # Step 2: Fetch Comments
     try:
@@ -42,6 +53,9 @@ def analyze_url(request: AnalyzeRequest):
             video_id=video_id,
             comments=comments_data["comments"]
         )
+        result["cached"] = False
+        result["source"] = "api"
+        cache_service.set(cache_key, result)
     except Exception as e:
         print(f"Analysis Error: {e}")
         raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
