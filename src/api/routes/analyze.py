@@ -13,7 +13,7 @@ youtube_service = YouTubeService()
 analyzer_service = AnalyzerService()
 cache_service = CacheService()
 
-@router.post("/analyze", dependencies=[Depends(rate_limiter)])
+@router.post("/analyze", response_model=AnalysisResponse, dependencies=[Depends(rate_limiter)])
 def analyze_url(request: AnalyzeRequest):
     """
     Analyze Sentiment of YouTube video comments
@@ -32,7 +32,7 @@ def analyze_url(request: AnalyzeRequest):
     if cached_data:
         cached_data["cached"] = True
         cached_data["source"] = "cache"
-        return AnalysisResponse(**cached_data)
+        return cached_data
     
     # Step 2: Fetch Comments
     try:
@@ -62,7 +62,7 @@ def analyze_url(request: AnalyzeRequest):
 
     # Step 4: Return Response
     try:
-        return AnalysisResponse(**result)
+        return result
     except Exception as e:
         print(f"Schema Validation Error: {e}")
         print(f"Result was: {result}")
