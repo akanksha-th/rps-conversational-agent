@@ -23,7 +23,7 @@ A REST API that analyzes sentiment of YouTube video comments using RoBERTa trans
 | Layer | Components & Responsibilities |
 | :--- | :--- |
 | **API Layer** | `POST /api/v1/analyze`, Rate Limiting (Redis) |
-| **Service Layer** | `YouTubeService` (fetch), `AnalyzerService` (orchestration), `CacheService` |
+| **Service Layer** | `YouTubeService` (fetch comments), `AnalyzerService` (orchestration), `CacheService` (Redis) |
 | **Model Layer** | `TextProcessor` (cleaning), `SentimentAnalyzer` (RoBERTa) |
 | **Data Layer** | Redis (caching), YouTube Data API v3 |
 
