@@ -73,7 +73,7 @@ def create_header(data: Dict[str, Any]) -> Panel:
     header_text.append("Processing Time: ", style="bold")
     header_text.append(f"{data['processing_time_ms']}\n", style="yellow")
     header_text.append("Cached: ", style="bold")    
-    cache_color = "orange" if data.get("chached", False) else "yellow"
+    cache_color = "orange" if data.get("cached", False) else "yellow"
     header_text.append(f"{data['cached']}\n", style=cache_color)
 
     return Panel(header_text, border_style="cyan", box=box.DOUBLE)
